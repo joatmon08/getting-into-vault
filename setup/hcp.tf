@@ -1,6 +1,6 @@
 module "hcp" {
   source  = "joatmon08/hcp/aws"
-  version = "4.0.2"
+  version = "5.0.0"
 
   hvn_region     = var.region
   hvn_name       = var.name
@@ -25,7 +25,8 @@ resource "aws_key_pair" "boundary" {
 module "bucket" {
   depends_on = [module.hcp]
 
-  source = "github.com/joatmon08/terraform-aws-hcp//modules/boundary-bucket"
+  source  = "joatmon08/hcp/aws//modules/boundary-bucket"
+  version = "5.0.0"
 
   name = var.name
 }
@@ -33,7 +34,8 @@ module "bucket" {
 module "worker" {
   depends_on = [module.bucket]
 
-  source = "github.com/joatmon08/terraform-aws-hcp//modules/boundary-worker"
+  source  = "joatmon08/hcp/aws//modules/boundary-worker"
+  version = "5.0.0"
 
   name                    = var.name
   boundary_addr           = module.hcp.boundary.public_endpoint
