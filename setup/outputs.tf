@@ -23,3 +23,11 @@ output "vpc" {
 output "boundary_worker_security_group_id" {
   value = module.worker.security_group_id
 }
+
+output "boundary_bucket_name" {
+  value = module.bucket.bucket_name
+}
+
+output "boundary_worker_role_arn" {
+  value = module.worker.role_arn
+}
