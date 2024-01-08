@@ -13,3 +13,9 @@ variable "vault_operators" {
   type        = set(string)
   description = "List of Vault operators"
 }
+
+variable "region" {
+  type        = string
+  description = "AWS region"
+  default     = "us-east-1"
+}

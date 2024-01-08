@@ -16,17 +16,22 @@ resource "boundary_host_set_static" "hosts" {
 }
 
 resource "boundary_target" "hosts" {
-  type                     = "tcp"
+  type                     = "ssh"
   name                     = "${var.name}-ssh"
   description              = "SSH for ${var.description}"
   scope_id                 = var.boundary_scope_id
   ingress_worker_filter    = "\"ingress\" in \"/tags/type\""
   session_connection_limit = 3
   default_port             = 22
+
+  enable_session_recording = true
+  storage_bucket_id        = var.boundary_storage_bucket_id
+
   host_source_ids = [
     boundary_host_set_static.hosts.id
   ]
-  brokered_credential_source_ids = [
+
+  injected_application_credential_source_ids = [
     var.boundary_credentials_library_id
   ]
 }

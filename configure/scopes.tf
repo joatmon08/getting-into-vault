@@ -22,3 +22,26 @@ resource "boundary_auth_method" "password" {
   type        = "password"
   scope_id    = boundary_scope.org.id
 }
+
+resource "boundary_storage_bucket" "aws" {
+  name        = "vault-server-session-recording"
+  description = "Session records for Vault servers"
+  scope_id    = boundary_scope.org.id
+  plugin_name = "aws"
+  bucket_name = data.terraform_remote_state.setup.outputs.boundary_bucket_name
+
+  secrets_json = jsonencode({})
+
+  attributes_json = jsonencode({
+    "region"                      = var.region,
+    "disable_credential_rotation" = true,
+    "role_arn"                    = data.terraform_remote_state.setup.outputs.boundary_worker_role_arn,
+
+  })
+
+  worker_filter = "\"ingress\" in \"/tags/type\""
+
+  lifecycle {
+    ignore_changes = [internal_force_update]
+  }
+}

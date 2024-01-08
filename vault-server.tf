@@ -64,5 +64,6 @@ module "boundary_target_vault_servers" {
     vault-server-0 = aws_instance.vault_server.private_ip
   }
 
-  boundary_scope_id = data.terraform_remote_state.configure.outputs.boundary_scope_id
+  boundary_scope_id          = data.terraform_remote_state.configure.outputs.boundary_scope_id
+  boundary_storage_bucket_id = data.terraform_remote_state.configure.outputs.boundary_storage_bucket_id
 }

@@ -22,3 +22,7 @@ output "vault_operators" {
 output "vault_operators_auth_method_id" {
   value = boundary_auth_method.password.id
 }
+
+output "boundary_storage_bucket_id" {
+  value = boundary_storage_bucket.aws.id
+}

@@ -27,3 +27,8 @@ variable "boundary_credentials_library_id" {
   type        = string
   description = "Boundary credentials library for targets"
 }
+
+variable "boundary_storage_bucket_id" {
+  type        = string
+  description = "Boundary storage bucket ID"
+}
