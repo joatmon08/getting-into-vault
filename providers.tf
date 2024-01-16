@@ -11,13 +11,18 @@ terraform {
   }
 }
 
+locals {
+  tags = {
+    Owner   = var.owner
+    Purpose = "Getting into Vault"
+    Name    = var.name
+  }
+}
+
 provider "aws" {
   region = var.region
   default_tags {
-    tags = {
-      Owner   = var.owner
-      Purpose = "Getting into Vault"
-    }
+    tags = local.tags
   }
 }
 
