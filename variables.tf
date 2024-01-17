@@ -15,6 +15,18 @@ variable "owner" {
   description = "Owner of the resources"
 }
 
+variable "server_desired_count" {
+  type        = number
+  description = "Desired number of Vault servers"
+  default     = 3
+}
+
+variable "allowed_traffic_cidr_blocks" {
+  type        = list(string)
+  description = "Allowed traffic CIDR blocks to Vault server load balancer"
+  default     = ["0.0.0.0/0"]
+}
+
 data "terraform_remote_state" "setup" {
   backend = "remote"
 

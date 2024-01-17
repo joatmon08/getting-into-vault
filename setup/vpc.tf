@@ -14,8 +14,8 @@ module "vpc" {
   name            = var.name
   cidr            = "10.0.0.0/16"
   azs             = data.aws_availability_zones.available.names
-  public_subnets  = ["10.0.0.0/24", "10.0.1.0/24"]
-  private_subnets = ["10.0.2.0/24", "10.0.3.0/24"]
+  public_subnets  = ["10.0.3.0/24", "10.0.4.0/24", "10.0.5.0/24"]
+  private_subnets = ["10.0.0.0/24", "10.0.1.0/24", "10.0.2.0/24"]
 
   manage_default_route_table = true
   default_route_table_tags   = { DefaultRouteTable = true }

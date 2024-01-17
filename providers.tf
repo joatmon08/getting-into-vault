@@ -8,6 +8,10 @@ terraform {
       source  = "hashicorp/boundary"
       version = "~> 1.1.11"
     }
+    tls = {
+      source  = "hashicorp/tls"
+      version = "~> 4.0.5"
+    }
   }
 }
 

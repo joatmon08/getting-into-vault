@@ -13,6 +13,15 @@ resource "aws_security_group_rule" "allow_boundary_worker_to_vault_server" {
   security_group_id        = aws_security_group.vault_server.id
 }
 
+resource "aws_security_group_rule" "allow_load_balancer_to_vault_server" {
+  type                     = "ingress"
+  from_port                = 8200
+  to_port                  = 8200
+  protocol                 = "tcp"
+  source_security_group_id = aws_security_group.load_balancer.id
+  security_group_id        = aws_security_group.vault_server.id
+}
+
 resource "aws_security_group_rule" "allow_vault_servers_8200" {
   type                     = "ingress"
   from_port                = 8200

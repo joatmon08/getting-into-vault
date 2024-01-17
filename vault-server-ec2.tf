@@ -16,66 +16,26 @@ data "aws_ami" "ubuntu" {
   ]
 }
 
-resource "aws_launch_template" "vault_server" {
-  name_prefix            = "vault-server-"
-  image_id               = data.aws_ami.ubuntu.image_id
-  instance_type          = "t3.small"
-  key_name               = local.keypair_name
-  vpc_security_group_ids = [aws_security_group.vault_server.id]
-
-  iam_instance_profile {
-    name = aws_iam_instance_profile.vault_server.name
-  }
-
-  tag_specifications {
-    resource_type = "instance"
-
-    tags = local.tags
-  }
-
-  tag_specifications {
-    resource_type = "volume"
-
-    tags = local.tags
-  }
-
-  user_data = base64encode(templatefile("${path.module}/scripts/server.sh", {
-    # for injecting variables
-  }))
+locals {
+  server_ips = [for i in local.vpc.private_subnets_cidr_blocks : cidrhost(i, 250)]
 }
 
-resource "aws_autoscaling_group" "vault_server" {
-  name_prefix = "${var.name}-vault-server-"
+resource "aws_instance" "vault_server" {
+  count = var.server_desired_count
 
-  launch_template {
-    id      = aws_launch_template.vault_server.id
-    version = aws_launch_template.vault_server.latest_version
-  }
+  ami                    = data.aws_ami.ubuntu.image_id
+  instance_type          = "t3.small"
+  vpc_security_group_ids = [aws_security_group.vault_server.id]
+  subnet_id              = local.vpc.private_subnets[count.index]
+  key_name               = local.keypair_name
 
-  desired_capacity = 3
-  min_size         = 1
-  max_size         = 3
+  private_ip = local.server_ips[count.index]
 
-  vpc_zone_identifier = local.vpc.private_subnets
+  iam_instance_profile = aws_iam_instance_profile.vault_server.name
 
-  health_check_grace_period = 300
-  health_check_type         = "EC2"
-  termination_policies      = ["OldestLaunchTemplate"]
-  wait_for_capacity_timeout = 0
-
-  enabled_metrics = [
-    "GroupDesiredCapacity",
-    "GroupInServiceCapacity",
-    "GroupPendingCapacity",
-    "GroupMinSize",
-    "GroupMaxSize",
-    "GroupInServiceInstances",
-    "GroupPendingInstances",
-    "GroupStandbyInstances",
-    "GroupStandbyCapacity",
-    "GroupTerminatingCapacity",
-    "GroupTerminatingInstances",
-    "GroupTotalCapacity",
-    "GroupTotalInstances"
-  ]
+  user_data = base64encode(templatefile("${path.module}/scripts/server.sh", {
+    SERVER_CA          = tls_self_signed_cert.ca_cert.cert_pem
+    SERVER_PUBLIC_KEY  = tls_locally_signed_cert.server_signed_cert.cert_pem
+    SERVER_PRIVATE_KEY = tls_private_key.server_key.private_key_pem
+  }))
 }
