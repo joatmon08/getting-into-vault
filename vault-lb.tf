@@ -18,28 +18,20 @@ resource "aws_lb_target_group" "vault_server" {
   health_check {
     enabled             = true
     interval            = 30
-    path                = "/v1/sys/seal-status"
+    path                = "/v1/sys/health"
     protocol            = "HTTPS"
     timeout             = 5
     healthy_threshold   = 3
     unhealthy_threshold = 3
-    matcher             = "200"
   }
-}
-
-resource "aws_lb_target_group_attachment" "vault_server" {
-  count            = var.server_desired_count
-  target_group_arn = aws_lb_target_group.vault_server.arn
-  target_id        = aws_instance.vault_server[count.index].id
-  port             = 8200
 }
 
 resource "aws_lb_listener" "vault_server" {
   load_balancer_arn = aws_lb.vault_server.arn
   port              = 8200
   protocol          = "TLS"
-  ssl_policy        = "ELBSecurityPolicy-2016-08"
-  certificate_arn   = aws_acm_certificate.cert.arn
+  ssl_policy        = "ELBSecurityPolicy-TLS-1-2-2017-01"
+  certificate_arn   = aws_acm_certificate.vault.arn
 
   default_action {
     type             = "forward"
@@ -62,7 +54,6 @@ resource "aws_security_group_rule" "load_balancer_allow_8200_from_external" {
   cidr_blocks       = var.allowed_traffic_cidr_blocks
   description       = "Allow HTTPS traffic to Vault servers"
 }
-
 
 resource "aws_security_group_rule" "load_balancer_allow_8200_from_servers" {
   security_group_id        = aws_security_group.load_balancer.id

@@ -21,6 +21,12 @@ variable "server_desired_count" {
   default     = 3
 }
 
+variable "server_tls_servername" {
+  type        = string
+  description = "Vault server TLS servername"
+  default     = "vault.server.com"
+}
+
 variable "allowed_traffic_cidr_blocks" {
   type        = list(string)
   description = "Allowed traffic CIDR blocks to Vault server load balancer"
