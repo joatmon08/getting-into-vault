@@ -36,15 +36,20 @@ storage "raft" {
   path    = "/opt/vault.d/"
   node_id = "$${instance_id}"
 
-  # retry_join {
-  #   auto_join               = "provider=aws region=${REGION} tag_key=${TAG_KEY} tag_value=${TAG_VALUE}"
-  #   auto_join_scheme        = "https"
-  #   leader_tls_servername   = "${LEADER_TLS_SERVERNAME}"
-  #   leader_ca_cert_file     = "/opt/vault/tls/ca.crt"
-  #   leader_client_cert_file = "/opt/vault/tls/tls.crt"
-  #   leader_client_key_file  = "/opt/vault/tls/tls.key"
-  # }
+  retry_join {
+    auto_join               = "provider=aws region=${REGION} tag_key=${TAG_KEY} tag_value=${TAG_VALUE}"
+    auto_join_scheme        = "https"
+    leader_tls_servername   = "${LEADER_TLS_SERVERNAME}"
+    leader_ca_cert_file     = "/opt/vault/tls/ca.crt"
+    leader_client_cert_file = "/opt/vault/tls/tls.crt"
+    leader_client_key_file  = "/opt/vault/tls/tls.key"
+  }
 }
+
+# seal "awskms" {
+#   region     = "${REGION}"
+#   kms_key_id = "${KMS_KEY_ID}"
+# }
 
 listener "tcp" {
   address            = "0.0.0.0:8200"

@@ -47,6 +47,7 @@ resource "aws_launch_template" "vault_server" {
     TAG_KEY               = "Name"
     TAG_VALUE             = var.name
     LEADER_TLS_SERVERNAME = var.server_tls_servername
+    KMS_KEY_ID            = aws_kms_key.vault.key_id
   }))
 }
 

@@ -21,6 +21,9 @@ data "aws_iam_policy_document" "instance_permissions_policy" {
     sid    = "DescribeInstances"
     effect = "Allow"
     actions = [
+      "kms:Encrypt",
+      "kms:Decrypt",
+      "kms:DescribeKey",
       "ec2:DescribeInstances"
     ]
     resources = [
