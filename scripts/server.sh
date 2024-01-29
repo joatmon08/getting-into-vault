@@ -46,10 +46,10 @@ storage "raft" {
   }
 }
 
-# seal "awskms" {
-#   region     = "${REGION}"
-#   kms_key_id = "${KMS_KEY_ID}"
-# }
+seal "awskms" {
+  region     = "${REGION}"
+  kms_key_id = "${KMS_KEY_ID}"
+}
 
 listener "tcp" {
   address            = "0.0.0.0:8200"
