@@ -21,13 +21,36 @@ data "aws_iam_policy_document" "instance_permissions_policy" {
     sid    = "DescribeInstances"
     effect = "Allow"
     actions = [
-      "kms:Encrypt",
-      "kms:Decrypt",
-      "kms:DescribeKey",
-      "ec2:DescribeInstances"
+
+      "ec2:DescribeInstances",
     ]
     resources = [
       "*"
+    ]
+  }
+
+  statement {
+    sid    = "VaultAutoUnsealKMS"
+    effect = "Allow"
+    actions = [
+      "kms:Encrypt",
+      "kms:Decrypt",
+      "kms:DescribeKey",
+    ]
+    resources = [
+      aws_kms_key.vault.arn
+    ]
+  }
+
+  statement {
+    sid    = "VaultBackup"
+    effect = "Allow"
+    actions = [
+      "s3:ListBucket",
+      "s3:*Object"
+    ]
+    resources = [
+      aws_s3_bucket.vault_backup.arn
     ]
   }
 }
