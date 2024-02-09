@@ -10,13 +10,6 @@ output "boundary_target_vault_servers" {
   }
 }
 
-output "boundary_target_vault_servers_green" {
-  value = {
-    credentials_library_id = boundary_credential_library_vault.vault_nodes.id
-    host_catalog_id        = boundary_host_catalog_static.vault_servers_green.id
-  }
-}
-
 output "boundary_scope_id" {
   value = boundary_scope.vault.id
 }
