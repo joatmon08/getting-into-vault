@@ -52,7 +52,6 @@ resource "aws_launch_template" "vault_server" {
     TAG_VALUE             = local.vault
     LEADER_TLS_SERVERNAME = var.server_tls_servername
     KMS_KEY_ID            = aws_kms_key.vault.key_id
-    BUCKET_NAME           = aws_s3_bucket.vault_backup.bucket
   }))
 }
 

@@ -18,13 +18,10 @@ data "aws_iam_policy_document" "instance_trust_policy" {
 
 data "aws_iam_policy_document" "instance_permissions_policy" {
   statement {
-    sid    = "DescribeInstances"
+    sid    = "VaultAutoJoin"
     effect = "Allow"
     actions = [
       "ec2:DescribeInstances",
-      "iam:GetInstanceProfile",
-      "iam:GetUser",
-      "iam:GetRole"
     ]
     resources = [
       "*"
@@ -44,15 +41,29 @@ data "aws_iam_policy_document" "instance_permissions_policy" {
     ]
   }
 
+  # statement {
+  #   sid    = "VaultBackup"
+  #   effect = "Allow"
+  #   actions = [
+  #     "s3:ListBucket",
+  #     "s3:*Object"
+  #   ]
+  #   resources = [
+  #     aws_s3_bucket.vault_backup.arn
+  #   ]
+  # }
+
   statement {
-    sid    = "VaultBackup"
+    sid    = "VaultAWSEC2AuthMethod"
     effect = "Allow"
     actions = [
-      "s3:ListBucket",
-      "s3:*Object"
+      "ec2:DescribeInstances",
+      "iam:GetInstanceProfile",
+      "iam:GetUser",
+      "iam:GetRole"
     ]
     resources = [
-      aws_s3_bucket.vault_backup.arn
+      "*"
     ]
   }
 
