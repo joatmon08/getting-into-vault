@@ -34,3 +34,4 @@ override.tf.json
 terraform.rc
 
 secrets.sh
+id_rsa.pem

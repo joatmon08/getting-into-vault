@@ -1,6 +1,6 @@
 module "hcp" {
   source  = "joatmon08/hcp/aws"
-  version = "5.0.0"
+  version = "5.0.2"
 
   hvn_region     = var.region
   hvn_name       = var.name
@@ -26,7 +26,7 @@ module "bucket" {
   depends_on = [module.hcp]
 
   source  = "joatmon08/hcp/aws//modules/boundary-bucket"
-  version = "5.0.0"
+  version = "5.0.2"
 
   name = var.name
 }
@@ -35,7 +35,7 @@ module "worker" {
   depends_on = [module.bucket]
 
   source  = "joatmon08/hcp/aws//modules/boundary-worker"
-  version = "5.0.0"
+  version = "5.0.2"
 
   name                    = var.name
   boundary_addr           = module.hcp.boundary.public_endpoint

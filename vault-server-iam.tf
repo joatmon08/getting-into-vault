@@ -21,38 +21,51 @@ data "aws_iam_policy_document" "instance_permissions_policy" {
     sid    = "DescribeInstances"
     effect = "Allow"
     actions = [
-
       "ec2:DescribeInstances",
+      "iam:GetInstanceProfile",
+      "iam:GetUser",
+      "iam:GetRole"
     ]
     resources = [
       "*"
     ]
   }
 
-  # statement {
-  #   sid    = "VaultAutoUnsealKMS"
-  #   effect = "Allow"
-  #   actions = [
-  #     "kms:Encrypt",
-  #     "kms:Decrypt",
-  #     "kms:DescribeKey",
-  #   ]
-  #   resources = [
-  #     aws_kms_key.vault.arn
-  #   ]
-  # }
+  statement {
+    sid    = "VaultAutoUnsealKMS"
+    effect = "Allow"
+    actions = [
+      "kms:Encrypt",
+      "kms:Decrypt",
+      "kms:DescribeKey",
+    ]
+    resources = [
+      aws_kms_key.vault.arn
+    ]
+  }
 
-  # statement {
-  #   sid    = "VaultBackup"
-  #   effect = "Allow"
-  #   actions = [
-  #     "s3:ListBucket",
-  #     "s3:*Object"
-  #   ]
-  #   resources = [
-  #     aws_s3_bucket.vault_backup.arn
-  #   ]
-  # }
+  statement {
+    sid    = "VaultBackup"
+    effect = "Allow"
+    actions = [
+      "s3:ListBucket",
+      "s3:*Object"
+    ]
+    resources = [
+      aws_s3_bucket.vault_backup.arn
+    ]
+  }
+
+  statement {
+    sid    = "VaultAWSEC2AuthMethodAssumeRole"
+    effect = "Allow"
+    actions = [
+      "sts:AssumeRole"
+    ]
+    resources = [
+      aws_iam_role.vault_server.arn
+    ]
+  }
 }
 
 resource "aws_iam_role_policy" "vault_server" {

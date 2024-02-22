@@ -1,6 +1,7 @@
 variable "host_ip_addresses" {
   type        = map(string)
   description = "Name of host with IP address"
+  default     = {}
 }
 
 variable "name" {
