@@ -5,7 +5,7 @@ instance_id=$( curl -Ss -H "X-aws-ec2-metadata-token: $imds_token" 169.254.169.2
 wget -O- https://apt.releases.hashicorp.com/gpg | sudo gpg --dearmor -o /usr/share/keyrings/hashicorp-archive-keyring.gpg
 echo "deb [signed-by=/usr/share/keyrings/hashicorp-archive-keyring.gpg] https://apt.releases.hashicorp.com $(lsb_release -cs) main" | sudo tee /etc/apt/sources.list.d/hashicorp.list
 
-apt update && sudo apt -y install vault
+apt update && sudo apt -y install vault jq consul
 
 mkdir -p /opt/vault.d
 chown vault:vault -R /opt/vault.d
@@ -61,3 +61,20 @@ EOF
 
 systemctl enable vault
 systemctl start vault
+
+az=$( curl -Ss -H "X-aws-ec2-metadata-token: $imds_token" 169.254.169.254/latest/meta-data/placement/availability-zone )
+if [[ $az == *"a" ]]; then
+  export VAULT_CACERT=/opt/vault/tls/ca.crt
+  vault operator init -format=json > /opt/vault/root.json
+
+  cat > /opt/vault/vault.env <<- EOF
+  export VAULT_CACERT=/opt/vault/tls/ca.crt
+  export VAULT_TOKEN=$(cat /opt/vault/root.json | jq -r .root_token)
+EOF
+fi
+
+mkdir -p /opt/consul
+cat > /opt/consul/consul.env <<- EOF
+export CONSUL_HTTP_ADDR=${CONSUL_HTTP_ADDR}
+export CONSUL_HTTP_TOKEN=${CONSUL_HTTP_TOKEN}
+EOF

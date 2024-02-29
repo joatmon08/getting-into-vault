@@ -31,3 +31,18 @@ output "boundary_bucket_name" {
 output "boundary_worker_role_arn" {
   value = module.worker.role_arn
 }
+
+output "consul" {
+  value     = module.hcp.consul
+  sensitive = true
+}
+
+output "database" {
+  value = {
+    url      = aws_db_instance.database.address
+    username = aws_db_instance.database.username
+    password = aws_db_instance.database.password
+    db_name  = aws_db_instance.database.db_name
+  }
+  sensitive = true
+}

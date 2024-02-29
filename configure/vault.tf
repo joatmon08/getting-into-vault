@@ -27,6 +27,38 @@ data "vault_policy_document" "boundary_worker_ssh" {
   }
 }
 
+resource "vault_mount" "database" {
+  path        = "database/static"
+  type        = "kv"
+  options     = { version = "2" }
+  description = "Static secrets for database"
+}
+
+resource "vault_kv_secret_v2" "database" {
+  mount               = vault_mount.boundary_worker.path
+  name                = "database"
+  delete_all_versions = true
+  data_json = jsonencode(
+    {
+      username = data.terraform_remote_state.setup.outputs.database.username
+      password = data.terraform_remote_state.setup.outputs.database.password
+    }
+  )
+}
+
+data "vault_policy_document" "database" {
+  rule {
+    path         = "${vault_kv_secret_v2.database.mount}/data/${vault_kv_secret_v2.database.name}"
+    capabilities = ["read"]
+    description  = "Get static database credentials for administrative access"
+  }
+}
+
+resource "vault_policy" "database" {
+  name   = "database"
+  policy = data.vault_policy_document.database.hcl
+}
+
 resource "vault_policy" "boundary_credentials_store" {
   name   = "boundary-credentials-store"
   policy = <<EOT
@@ -62,7 +94,7 @@ resource "vault_policy" "boundary_worker_ssh" {
 }
 
 resource "vault_token" "boundary_worker_ssh" {
-  policies          = [vault_policy.boundary_worker_ssh.name, vault_policy.boundary_credentials_store.name]
+  policies          = [vault_policy.boundary_worker_ssh.name, vault_policy.boundary_credentials_store.name, vault_policy.database.name]
   no_default_policy = true
   no_parent         = true
   ttl               = "180d"
@@ -71,3 +103,4 @@ resource "vault_token" "boundary_worker_ssh" {
   renewable         = true
   num_uses          = 0
 }
+

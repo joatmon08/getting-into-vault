@@ -1,5 +1,5 @@
 locals {
-  cidr_prefix = split("/", local.vpc.private_subnets_cidr_blocks.0)[1]
+  cidr_prefix = split("/", local.vpc.private_subnets_cidr_blocks[0])[1]
 
   host_numbers = range(pow(2, 32 - local.cidr_prefix))
   ip_addresses = flatten([for subnet in local.vpc.private_subnets_cidr_blocks : [for host_number in local.host_numbers : cidrhost(subnet, host_number)]])

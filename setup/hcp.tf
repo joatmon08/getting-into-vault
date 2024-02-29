@@ -11,6 +11,9 @@ module "hcp" {
 
   hcp_vault_name            = var.name
   hcp_vault_public_endpoint = true
+
+  hcp_consul_name            = var.name
+  hcp_consul_public_endpoint = true
 }
 
 resource "tls_private_key" "boundary" {
