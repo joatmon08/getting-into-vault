@@ -32,11 +32,6 @@ output "boundary_worker_role_arn" {
   value = module.worker.role_arn
 }
 
-output "consul" {
-  value     = module.hcp.consul
-  sensitive = true
-}
-
 output "database" {
   value = {
     url      = aws_db_instance.database.address

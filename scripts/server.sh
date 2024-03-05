@@ -72,9 +72,3 @@ if [[ $az == *"a" ]]; then
   export VAULT_TOKEN=$(cat /opt/vault/root.json | jq -r .root_token)
 EOF
 fi
-
-mkdir -p /opt/consul
-cat > /opt/consul/consul.env <<- EOF
-export CONSUL_HTTP_ADDR=${CONSUL_HTTP_ADDR}
-export CONSUL_HTTP_TOKEN=${CONSUL_HTTP_TOKEN}
-EOF

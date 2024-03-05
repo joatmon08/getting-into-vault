@@ -58,5 +58,4 @@ data "terraform_remote_state" "configure" {
 locals {
   keypair_name = data.terraform_remote_state.setup.outputs.boundary_worker_keypair.name
   vpc          = data.terraform_remote_state.setup.outputs.vpc
-  consul       = data.terraform_remote_state.setup.outputs.consul
 }

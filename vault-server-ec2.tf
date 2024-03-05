@@ -52,8 +52,6 @@ resource "aws_launch_template" "vault_server" {
     TAG_VALUE             = local.vault
     LEADER_TLS_SERVERNAME = var.server_tls_servername
     KMS_KEY_ID            = aws_kms_key.vault.key_id
-    CONSUL_HTTP_ADDR      = local.consul.public_endpoint
-    CONSUL_HTTP_TOKEN     = local.consul.token
   }))
 }
 
