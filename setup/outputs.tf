@@ -41,3 +41,11 @@ output "database" {
   }
   sensitive = true
 }
+
+output "kubernetes" {
+  value = {
+    id                = module.eks.cluster_name
+    endpoint          = module.eks.cluster_endpoint
+    security_group_id = module.eks.node_security_group_id
+  }
+}
