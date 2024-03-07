@@ -77,6 +77,18 @@ data "aws_iam_policy_document" "instance_permissions_policy" {
       aws_iam_role.vault_server.arn
     ]
   }
+
+  statement {
+    sid    = "VaultEC2toAWSEKS"
+    effect = "Allow"
+    actions = [
+      "eks:DescribeCluster",
+      "eks:ListClusters"
+    ]
+    resources = [
+      "*"
+    ]
+  }
 }
 
 resource "aws_iam_role_policy" "vault_server" {

@@ -29,4 +29,15 @@ module "eks" {
       instance_types = ["m5.large"]
     }
   }
+
+  cluster_security_group_additional_rules = {
+    vault_servers = {
+      description = "Allow Vault servers to access Kubernetes cluster"
+      protocol    = "tcp"
+      from_port   = 443
+      to_port     = 443
+      type        = "ingress"
+      cidr_blocks = [module.vpc.vpc_cidr_block]
+    }
+  }
 }
