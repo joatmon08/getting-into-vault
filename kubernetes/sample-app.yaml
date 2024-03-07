@@ -1,18 +1,18 @@
----
-apiVersion: v1
-kind: Service
-metadata:
-  name: sample-app
-  namespace: sample-app
-  labels:
-    app: sample-app
-spec:
-  type: LoadBalancer
-  ports:
-    - port: 8080
-      targetPort: 8080
-  selector:
-    app: sample-app
+# ---
+# apiVersion: v1
+# kind: Service
+# metadata:
+#   name: sample-app
+#   namespace: sample-app
+#   labels:
+#     app: sample-app
+# spec:
+#   type: LoadBalancer
+#   ports:
+#     - port: 8080
+#       targetPort: 8080
+#   selector:
+#     app: sample-app
 ---
 apiVersion: v1
 kind: ServiceAccount
@@ -57,12 +57,17 @@ spec:
       serviceAccountName: sample-app
       containers:
         - name: sample-app
-          image: joatmon08/sample-vault-app:0.0.1
+          image: joatmon08/sample-vault-app:0.0.2
           ports:
             - containerPort: 8080
           env:
+            - name: GIN_MODE
+              value: release
             - name: DB_ADDRESS
-              value: getting-into-vault.cl3xt9calu0m.us-east-1.rds.amazonaws.com
+              valueFrom:
+                secretKeyRef:
+                  name: database
+                  key: address
             - name: DB_USERNAME
               valueFrom:
                 secretKeyRef:
