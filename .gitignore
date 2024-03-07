@@ -35,3 +35,4 @@ terraform.rc
 
 secrets.sh
 id_rsa.pem
+kubernetes/secrets.yaml
