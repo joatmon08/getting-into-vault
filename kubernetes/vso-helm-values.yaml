@@ -1,0 +1,4 @@
+defaultVaultConnection:
+  enabled: true
+  address: ""
+  skipTLSVerify: true

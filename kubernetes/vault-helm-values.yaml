@@ -1,0 +1,6 @@
+global:
+  namespace: vault
+  externalVaultAddr: ""
+
+injector:
+  enabled: true

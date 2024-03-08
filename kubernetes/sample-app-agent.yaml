@@ -1,0 +1,120 @@
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: sample-app
+  namespace: sample-app
+  labels:
+    app: sample-app
+spec:
+  type: LoadBalancer
+  ports:
+    - port: 8080
+      targetPort: 8080
+  selector:
+    app: sample-app
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: sample-app
+  namespace: sample-app
+---
+apiVersion: v1
+kind: Secret
+type: kubernetes.io/service-account-token
+metadata:
+  name: sample-app
+  namespace: sample-app
+  annotations:
+    kubernetes.io/service-account.name: "sample-app"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: sample-app
+  namespace: sample-app
+  labels:
+    app: sample-app
+spec:
+  type: LoadBalancer
+  ports:
+    - port: 8080
+      targetPort: 8080
+  selector:
+    app: sample-app
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: sample-app
+  namespace: sample-app
+---
+apiVersion: v1
+kind: Secret
+type: kubernetes.io/service-account-token
+metadata:
+  name: sample-app
+  namespace: sample-app
+  annotations:
+    kubernetes.io/service-account.name: "sample-app"
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: sample-app
+  namespace: sample-app
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      service: sample-app
+      app: sample-app
+  template:
+    metadata:
+      labels:
+        service: sample-app
+        app: sample-app
+      annotations:
+        vault.hashicorp.com/tls-skip-verify: "true"
+        vault.hashicorp.com/agent-inject: "true"
+        vault.hashicorp.com/role: "sample-app"
+
+        vault.hashicorp.com/agent-inject-secret-app.env: "database/creds/sample-app"
+        vault.hashicorp.com/agent-inject-template-app.env: |
+          {{- with secret "database/creds/sample-app" }}
+          DB_USERNAME={{ .Data.username }}
+          DB_PASSWORD={{ .Data.password }}
+          {{- end }}
+        vault.hashicorp.com/agent-inject-command-app.env: |
+          kill -TERM $(pidof sample-vault-app)
+        vault.hashicorp.com/agent-run-as-same-user: "true"
+    spec:
+      serviceAccountName: sample-app
+      shareProcessNamespace: true
+      containers:
+        - name: sample-app
+          image: joatmon08/sample-vault-app:0.0.2
+          ports:
+            - containerPort: 8080
+          env:
+            - name: GIN_MODE
+              value: release
+            - name: DB_ADDRESS
+              valueFrom:
+                secretKeyRef:
+                  name: database
+                  key: address
+            - name: CONFIG_FILE_PATH
+              value: /vault/secrets
+          securityContext:
+            runAsUser: 1000
+            runAsGroup: 3000
+          livenessProbe:
+            httpGet:
+              path: /
+              port: 8080
+            initialDelaySeconds: 15
+            timeoutSeconds: 1
+            periodSeconds: 10
+            failureThreshold: 30

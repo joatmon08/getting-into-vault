@@ -1,4 +1,65 @@
 ---
+apiVersion: secrets.hashicorp.com/v1beta1
+kind: VaultAuth
+metadata:
+  name: sample-app
+  namespace: sample-app
+spec:
+  method: kubernetes
+  mount: kubernetes
+  kubernetes:
+    role: sample-app
+    serviceAccount: sample-app
+    audiences:
+      - vault
+---
+apiVersion: secrets.hashicorp.com/v1beta1
+kind: VaultDynamicSecret
+metadata:
+  name: sample-app-database
+  namespace: sample-app
+spec:
+  mount: database
+  path: creds/sample-app
+  destination:
+    create: true
+    name: database-vault
+    type: Opaque
+  vaultAuthRef: sample-app
+  rolloutRestartTargets:
+  - kind: Deployment
+    name: sample-app
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: sample-app
+  namespace: sample-app
+  labels:
+    app: sample-app
+spec:
+  type: LoadBalancer
+  ports:
+    - port: 8080
+      targetPort: 8080
+  selector:
+    app: sample-app
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: sample-app
+  namespace: sample-app
+---
+apiVersion: v1
+kind: Secret
+type: kubernetes.io/service-account-token
+metadata:
+  name: sample-app
+  namespace: sample-app
+  annotations:
+    kubernetes.io/service-account.name: "sample-app"
+---
 apiVersion: v1
 kind: Service
 metadata:
@@ -45,14 +106,6 @@ spec:
       labels:
         service: sample-app
         app: sample-app
-      # annotations:
-      #   vault.hashicorp.com/agent-inject: "true"
-      #   vault.hashicorp.com/role: "sample-app"
-
-      #   vault.hashicorp.com/agent-inject-secret-app.env: ""
-      #   vault.hashicorp.com/agent-inject-template-app.env: ""
-      #   vault.hashicorp.com/agent-inject-command-app.env: ""
-
     spec:
       serviceAccountName: sample-app
       containers:
@@ -71,12 +124,12 @@ spec:
             - name: DB_USERNAME
               valueFrom:
                 secretKeyRef:
-                  name: database
+                  name: database-vault
                   key: username
             - name: DB_PASSWORD
               valueFrom:
                 secretKeyRef:
-                  name: database
+                  name: database-vault
                   key: password
           livenessProbe:
             httpGet:
