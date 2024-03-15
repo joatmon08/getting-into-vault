@@ -88,3 +88,31 @@ if [[ $az == *"a" ]]; then
   export VAULT_TOKEN=$(cat /opt/vault/root.json | jq -r .root_token)
 EOF
 fi
+
+mkdir -p /opt/vault/pki
+
+cat > /opt/vault/pki/extfile.cnf <<- EOF
+basicConstraints=CA:TRUE
+authorityKeyIdentifier=keyid
+EOF
+
+cat > /opt/vault/pki/offline_ca.sh <<- EOF
+export CERT_C="US"
+export CERT_ST="California"
+export CERT_L="San Francisco"
+
+mkdir -p /opt/vault/pki/root
+mkdir -p /opt/vault/pki/intermediate
+
+openssl genrsa -des3 -out /opt/vault/pki/root/ca.key 4096
+openssl req -new -x509 -days 3650 -key /opt/vault/pki/root/ca.key \
+    -out /opt/vault/pki/root/ca.crt \
+    -subj "/C=$${CERT_C}/ST=$${CERT_ST}/L=$${CERT_L}/O=HashiCorp/OU=Community/CN=Example Root CA"
+
+### GET CSR FROM VAULT!
+
+openssl x509 -req -in /opt/vault/pki/intermediate/ca.csr \
+    -extfile /opt/vault/pki/extfile.cnf \
+    -CA /opt/vault/pki/root/ca.crt -CAkey /opt/vault/pki/root/ca.key \
+    -CAcreateserial -out /opt/vault/pki/intermediate/ca.crt -days 1096 -sha256
+EOF
