@@ -13,6 +13,15 @@ resource "aws_security_group_rule" "allow_boundary_worker_to_vault_server" {
   security_group_id        = aws_security_group.vault_server.id
 }
 
+resource "aws_security_group_rule" "allow_hcp_to_ec2_instances" {
+  type              = "ingress"
+  from_port         = 8200
+  to_port           = 8200
+  protocol          = "tcp"
+  cidr_blocks       = [var.hvn_cidr_block]
+  security_group_id = aws_security_group.vault_server.id
+}
+
 resource "aws_security_group_rule" "allow_load_balancer_to_vault_server" {
   type                     = "ingress"
   from_port                = 8200

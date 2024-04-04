@@ -10,6 +10,17 @@ variable "region" {
   default     = "us-east-1"
 }
 
+variable "hvn_cidr_block" {
+  type        = string
+  description = "HashiCorp Cloud Platform CIDR block"
+  default     = "172.26.16.0/20"
+}
+
+variable "hcp_project_id" {
+  type        = string
+  description = "HCP project ID"
+}
+
 variable "owner" {
   type        = string
   description = "Owner of the resources"

@@ -18,6 +18,10 @@ terraform {
       source  = "hashicorp/kubernetes"
       version = "~> 2.27.0"
     }
+    hcp = {
+      source  = "hashicorp/hcp"
+      version = "~> 0.79.0"
+    }
   }
 }
 
@@ -27,6 +31,10 @@ locals {
     Purpose = "Getting into Vault"
     Name    = var.name
   }
+}
+
+provider "hcp" {
+  project_id = var.hcp_project_id
 }
 
 provider "aws" {
